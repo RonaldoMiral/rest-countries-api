@@ -8,6 +8,7 @@ export const NavBar = styled(NavBarContent)`
   background-color: red;
   padding: 3rem 8.2rem 3.2rem;
   color: hsl(0, 0%, 100%);
+  background-color: hsl(209, 23%, 22%);
 
   & h1 {
     margin: 0;
