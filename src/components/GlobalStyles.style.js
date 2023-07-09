@@ -13,4 +13,8 @@ export const GlobalStyles = createGlobalStyle`
         font-family: "Nunito Sans";
         font-size: 1.6rem;
     }
+
+    .hide {
+        display: none;
+    }
 `;
