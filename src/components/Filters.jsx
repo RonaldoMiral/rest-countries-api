@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import search from '../assets/search.svg';
 import dropIcon from '../assets/chevron-down-solid.svg';
 import {
@@ -13,13 +13,75 @@ import {
   Label,
 } from './FilterContainer.style';
 
-const Filters = () => {
+const Filters = ({
+  data,
+  filterByRegion,
+  filterByCountryName,
+  filteredData,
+  searchedByRegion,
+}) => {
+  // const [countries, setCountries] = useState(Array.from(data));
   const [visible, setVisible] = useState(false);
+  const [targetCountry, setTargetCountry] = useState('');
+
+  // Used to hide or show the custom select
   const dropRegions = (e) => setVisible((prevState) => !prevState);
+
+  // There are more than needed region so that it is necessary to filter them
+  // And then turn it into a set to avoid duplicated numbers.
+  const NeededRegions = new Set(
+    data
+      .map((country) => {
+        if (
+          country.region !== 'Antarctic' &&
+          country.region !== 'Antarctic Ocean' &&
+          country.region !== 'Polar'
+        )
+          return country.region;
+      })
+      .filter(Boolean)
+  );
+
+  // Converting back to an array
+  const regions = Array.from(NeededRegions)
+    .sort()
+    .map((region) => (
+      <Region
+        key={region.substring(0, 3)}
+        onClick={() => filterByRegion(region)}
+      >
+        {region}
+      </Region>
+    ));
+
+  // Responsible to search a country by its name
+  const handleSearchCountry = (event) => {
+    setTargetCountry(event.target.value);
+  };
+
+  // Makes sure that the typed text is immediately includes in the search
+  // What enables it is the useEffect hook, as it is tracking
+  // the targetCountry state
+  useEffect(() => {
+    if (targetCountry === '') {
+      filterByCountryName(searchedByRegion);
+    } else {
+      const regex = new RegExp(`^${targetCountry}`, 'i');
+      const targets = Array.from(filteredData).filter((country) =>
+        regex.test(country.name)
+      );
+
+      filterByCountryName(targets);
+    }
+  }, [targetCountry]);
 
   return (
     <FilterContainer>
-      <Input placeholder="Search for a country..." />
+      <Input
+        value={targetCountry}
+        onChange={handleSearchCountry}
+        placeholder="Search for a country..."
+      />
       <SearchIcon src={search} />
 
       <CustomSelect onClick={dropRegions}>
@@ -28,60 +90,10 @@ const Filters = () => {
           <DropMenuIcon src={dropIcon} />
         </LabelContainer>
 
-        {visible && (
-          <Regions>
-            <Region>Africa</Region>
-            <Region>America</Region>
-            <Region>Asia</Region>
-            <Region>Europa</Region>
-            <Region>Oceania</Region>
-          </Regions>
-        )}
+        {visible && <Regions>{regions}</Regions>}
       </CustomSelect>
     </FilterContainer>
   );
-
-  {
-    /* // return (
-  //   <FilterContainer>
-  //     <div className="search-field">
-  //       <input type="text" id="" placeholder="Search for a country..." />
-  //       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  //         <path */
-  }
-  //           d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"
-  //           fill="hsl(0, 0%, 100%)"
-  //         />
-  //       </svg>
-  //     </div>
-
-  //     <CustomSelect onClick={() => dropMenu()}>
-  //       <LabelContainer onClick={() => dropMenu()}>
-  //         <label onClick={() => dropMenu()}>Filter by Region</label>
-  //         <svg
-  //           xmlns="http://www.w3.org/2000/svg"
-  //           viewBox="0 0 512 512"
-  //           onClick={() => dropMenu()}
-  //         >
-  //           <path
-  //             d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"
-  //             fill="hsl(0, 0%, 100%)"
-  //           />
-  //         </svg>
-  //       </LabelContainer>
-
-  //       {visible && (
-  //         <UnOrderedList>
-  //           <li>Africa</li>
-  //           <li>America</li>
-  //           <li>Asia</li>
-  //           <li>Europa</li>
-  //           <li>Oceania</li>
-  //         </UnOrderedList>
-  //       )}
-  //     </CustomSelect>
-  //   </FilterContainer>
-  // );
 };
 
 export default Filters;

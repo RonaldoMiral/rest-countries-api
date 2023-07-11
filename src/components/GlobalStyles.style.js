@@ -12,7 +12,7 @@ export const GlobalStyles = createGlobalStyle`
     body {
         font-family: "Nunito Sans";
         font-size: 1.6rem;
-        overflow: hidden;
+        /* overflow: hidden; */
     }
 
     .hide {

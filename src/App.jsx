@@ -1,18 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-import { GlobalStyles } from './components/GlobalStyles.style';
 import { AppContainer } from './components/AppContainer.style';
 import { NavBar } from './components/NavBar.style';
 import { HomeContainer } from './components/HomeContainer.style';
-import { FilterContainer } from './components/FilterContainer.style';
 import { CountriesContainer } from './components/CountriesContainer.style';
 import Country from './components/Country';
-import { CountryStyled } from './components/CountryStyled.style';
 import Filters from './components/Filters';
 
 function App() {
   const [data, setData] = useState('Loading...');
+  const [filteredData, setFilteredData] = useState([]);
+  const [searchedByRegion, setSearchedByRegion] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -27,22 +26,43 @@ function App() {
     fetchData();
   }, []);
 
-  if (!Array.isArray(data)) {
-    return <div>Loading</div>;
-  }
+  // Make sure to not send a empty array/state
+  if (!Array.isArray(data)) return <div>Loading</div>;
 
-  console.log(data[3]);
+  // Will this state to render all data, this will help with the filter mechanism
+  if (filteredData.length === 0) setFilteredData(data);
 
-  const countries = data.map((item) => (
+  // Filters the countries by the regions they are in.
+  const filterByRegion = (region) => {
+    const filteredCountries = data.filter(
+      (country) => country.region === region
+    );
+
+    setFilteredData(filteredCountries);
+    setSearchedByRegion(filteredCountries);
+  };
+
+  // FILTER BY COUNTRY NAME
+  const filterByCountryName = (filtered) => {
+    setFilteredData(filtered);
+  };
+
+  // Renders All the the countries
+  const countries = filteredData.map((item) => (
     <Country key={item.numericCode} country={item} />
   ));
 
   return (
     <AppContainer>
-      <GlobalStyles />
       <NavBar />
       <HomeContainer>
-        <Filters />
+        <Filters
+          data={data}
+          filterByRegion={filterByRegion}
+          filterByCountryName={filterByCountryName}
+          filteredData={filteredData}
+          searchedByRegion={searchedByRegion}
+        />
         <CountriesContainer>{countries}</CountriesContainer>
       </HomeContainer>
     </AppContainer>

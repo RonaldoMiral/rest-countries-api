@@ -78,6 +78,7 @@ export const Regions = styled.ul`
 `;
 
 export const Region = styled.li`
+  line-height: 1;
   &:hover {
     background-color: hsla(207, 26%, 17%, 0.3);
     border-radius: 0.5rem;
