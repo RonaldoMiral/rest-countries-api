@@ -1,39 +1,30 @@
-import React from 'react';
-import {
-  CountryName,
-  CountryStyled,
-  Details,
-  FlagImage,
-  Info,
-  InfoContainer,
-  Legend,
-  Strong,
-} from './CountryStyled.style';
+import React, { useEffect, useState } from 'react';
 
-const Country = ({ country }) => {
-  return (
-    <CountryStyled>
-      <FlagImage src={country.flag} />
-      <Details>
-        <CountryName>{country.name}</CountryName>
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
-        <InfoContainer>
-          <Legend>
-            <Strong>Population:</Strong>
-            <Info>{country.population}</Info>
-          </Legend>
-          <Legend>
-            <Strong>Region:</Strong>
-            <Info>{country.region}</Info>
-          </Legend>
-          <Legend>
-            <Strong>Capital:</Strong>
-            <Info>{country.capital}</Info>
-          </Legend>
-        </InfoContainer>
-      </Details>
-    </CountryStyled>
+const Country = () => {
+  const [countries, setCountries] = useState([]);
+  const { countryName } = useParams();
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axios.get('http://127.0.0.1:5173/data.json');
+        setCountries(response.data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    fetchData();
+  }, []);
+
+  const country = countries.filter(
+    (country) => country.name.toLowerCase() === countryName
   );
+  console.log(country);
+
+  return <div>Country: {countryName}</div>;
 };
 
 export default Country;
